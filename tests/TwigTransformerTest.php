@@ -34,15 +34,18 @@ class TwigTransformerTest extends \PHPUnit_Framework_TestCase
         self::assertEquals('twig', $engine->getName());
     }
 
-    public function testConstructor()
+    public function testTwigProvided()
     {
-        $loader = new \Twig_Loader_Filesystem(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader = new \Twig_Loader_Filesystem();
+        $loader->addPath(__DIR__.DIRECTORY_SEPARATOR.'Fixtures', 'test');
         $twig = new \Twig_Environment($loader);
         $engine = new TwigTransformer(array('twig' => $twig));
+
+        $template = '@test/TwigTransformer.twig';
         $locals = array(
             'name' => 'Linus',
         );
-        $actual = $engine->renderFile('tests/Fixtures/TwigTransformer.twig', $locals);
+        $actual = $engine->renderFile($template, $locals);
         self::assertEquals('Hello, Linus!', $actual);
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
-namespace PhpTransformers\PhpTransformer;
+namespace PhpTransformers\Twig;
 
+use PhpTransformers\PhpTransformer\Transformer;
 use Twig_Loader_String;
 use Twig_Loader_Filesystem;
 use Twig_Environment;

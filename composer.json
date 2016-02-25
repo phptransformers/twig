@@ -20,7 +20,7 @@
     ],
     "require": {
         "php" : ">=5.3.0",
-        "phptransformers/phptransformer": "~0.0.1",
+        "phptransformers/phptransformer": "~1.0.0",
         "twig/twig": "~1.18.1"
     },
     "require-dev": {

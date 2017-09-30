@@ -3,7 +3,7 @@
 namespace PhpTransformers\Twig;
 
 use PhpTransformers\PhpTransformer\Transformer;
-use Twig_Loader_String;
+use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Twig_Environment;
 
@@ -14,11 +14,10 @@ class TwigTransformer extends Transformer
 
     public function __construct(array $options = array())
     {
-        $this->loaders['string'] = new \Twig_Loader_String();
         if (isset($options['twig'])) {
             $this->twig = $options['twig'];
         } else {
-            $this->twig = new Twig_Environment($this->loaders['string'], $options);
+            $this->twig = new Twig_Environment(new Twig_Loader_Chain(), $options);
         }
     }
 
@@ -29,10 +28,17 @@ class TwigTransformer extends Transformer
 
     public function render($template, array $locals = array())
     {
-        // Render the file using the straight string.
-        $this->twig->setLoader($this->loaders['string']);
+        // Create a temporary template in the system tmp directiry
+        $tmp = tempnam(sys_get_temp_dir(), 'phptransformer-twig');
+        file_put_contents($tmp, $template);
 
-        return trim($this->twig->render($template, $locals));
+        // Render the file
+        $data = $this->renderFile($tmp, $locals);
+
+        // Remove the temporary template
+        unlink($tmp);
+
+        return $data;
     }
 
     public function renderFile($file, array $locals = array())
@@ -42,9 +48,25 @@ class TwigTransformer extends Transformer
         if (!isset($this->loaders[$path])) {
             $this->loaders[$path] = new Twig_Loader_Filesystem($path);
         }
+
+        // Save the current loader
+        try {
+            $previousLoader = $this->twig->getLoader();
+        } catch (\LogicException $e) {
+            $previousLoader = null;
+        }
+
+        // Set the filesystem loader to use
         $this->twig->setLoader($this->loaders[$path]);
 
         // Render the file using its file name.
-        return trim($this->twig->render(basename($file), $locals));
+        $data = trim($this->twig->render(basename($file), $locals));
+
+        // Restore previous loader;
+        if ($previousLoader) {
+            $this->twig->setLoader($previousLoader);
+        }
+
+        return $data;
     }
 }

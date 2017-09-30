@@ -20,7 +20,7 @@ class TwigTransformerTest extends \PHPUnit_Framework_TestCase
     public function testRender()
     {
         $engine = new TwigTransformer();
-        $template = file_get_contents('tests/Fixtures/TwigTransformer.twig');
+        $template = file_get_contents(__DIR__ . '/Fixtures/TwigTransformer.twig');
         $locals = array(
             'name' => 'Linus',
         );
@@ -42,7 +42,7 @@ class TwigTransformerTest extends \PHPUnit_Framework_TestCase
         $locals = array(
             'name' => 'Linus',
         );
-        $actual = $engine->renderFile('tests/Fixtures/TwigTransformer.twig', $locals);
+        $actual = $engine->renderFile(__DIR__ . '/Fixtures/TwigTransformer.twig', $locals);
         self::assertEquals('Hello, Linus!', $actual);
     }
 }
